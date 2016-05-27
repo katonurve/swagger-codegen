@@ -1,9 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.IO;
-using System.Web;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -65,7 +65,7 @@ namespace {{packageName}}.Client
         public IEnumerator CallApi(String path, RestSharp.Method method, Dictionary<String, String> queryParams, String postBody,
             Dictionary<String, String> headerParams, Dictionary<String, String> formParams,
             Dictionary<String, FileParameter> fileParams, String[] authSettings,
-            Action<IResponse> success, Action<ApiException> failure)
+            Action<IRestResponse> success, Action<ApiException> failure)
         {
 
             var request = new RestRequest(path, method);
@@ -95,7 +95,12 @@ namespace {{packageName}}.Client
             if (postBody != null) // http body (model) parameter
                 request.AddParameter("application/json", postBody, ParameterType.RequestBody);
 
-            yield return RestClient.Execute(request, success, failure);
+            yield return RestClient.Execute(request, success, 
+              (e) =>
+              {
+                var apiException = new ApiException(0, "Local Exception:" + e.Message);
+                failure(apiException);
+              });
 
         }
 

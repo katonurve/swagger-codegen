@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using RestSharp;
 using {{packageName}}.Client;
@@ -19,7 +20,7 @@ namespace {{packageName}}.Api
         /// </summary>
         {{#allParams}}/// <param name="{{paramName}}">{{description}}</param>
         {{/allParams}}/// <returns>{{#returnType}}{{returnType}}{{/returnType}}</returns>
-        IEnumerator {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}, {{#returnType}}Action<{{{returnType}}}>{{/returnType}}{{^returnType}}Action{{/returnType}} sucess, Action<ApiException> failure);
+        IEnumerator {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}, {{#returnType}}Action<{{{returnType}}}>{{/returnType}}{{^returnType}}Action{{/returnType}} success, Action<ApiException> failure);
         {{/operation}}
     }
 
@@ -82,7 +83,7 @@ namespace {{packageName}}.Api
         /// </summary>
         {{#allParams}}/// <param name="{{paramName}}">{{description}}</param>
         {{/allParams}}/// <returns>{{#returnType}}{{returnType}}{{/returnType}}</returns>
-        public IEnumerator {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}, {{#returnType}}Action<{{{returnType}}}>{{/returnType}}{{^returnType}}Action{{/returnType}} sucess, Action<ApiException> failure)
+        public IEnumerator {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}, {{#returnType}}Action<{{{returnType}}}>{{/returnType}}{{^returnType}}Action{{/returnType}} success, Action<ApiException> failure)
         {
             {{#allParams}}{{#required}}
             // verify the required parameter '{{paramName}}' is set
@@ -116,7 +117,7 @@ namespace {{packageName}}.Api
             yield return ApiClient.CallApi(path, Method.{{httpMethod}}, queryParams, postBody, headerParams, formParams, fileParams, authSettings,
                (response) => {
                  if (((int)response.StatusCode) >= 400)
-                     failrue(new ApiException ((int)response.StatusCode, "Error calling {{nickname}}: " + response.Content, response.Content));
+                     failure(new ApiException ((int)response.StatusCode, "Error calling {{nickname}}: " + response.Content, response.Content));
                  else if (((int)response.StatusCode) == 0)
                      failure(new ApiException ((int)response.StatusCode, "Error calling {{nickname}}: " + response.ErrorMessage, response.ErrorMessage));
                  else
