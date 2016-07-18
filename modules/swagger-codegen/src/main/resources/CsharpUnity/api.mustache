@@ -116,13 +116,16 @@ namespace {{packageName}}.Api
             // make the HTTP request
             yield return ApiClient.CallApi(path, Method.{{httpMethod}}, queryParams, postBody, headerParams, formParams, fileParams, authSettings,
                (response) => {
-                 if (((int)response.StatusCode) >= 400)
-                     failure(new ApiException ((int)response.StatusCode, "Error calling {{nickname}}: " + response.Content, response.Content));
-                 else if (((int)response.StatusCode) == 0)
-                     failure(new ApiException ((int)response.StatusCode, "Error calling {{nickname}}: " + response.ErrorMessage, response.ErrorMessage));
-                 else
-                     {{#returnType}}success(({{{returnType}}}) ApiClient.Deserialize(response.Content, typeof({{{returnType}}}), response.Headers));{{/returnType}}{{^returnType}}success();{{/returnType}}
-
+                 try {
+                     if (((int)response.StatusCode) >= 400)
+                         throw new ApiException((int)response.StatusCode, "Error calling {{nickname}}: " + response.Content, response.Content);
+                     else if (((int)response.StatusCode) == 0)
+                         throw new ApiException((int)response.StatusCode, "Error calling {{nickname}}: " + response.ErrorMessage, response.ErrorMessage);
+                     else
+                         {{#returnType}}success(({{{returnType}}}) ApiClient.Deserialize(response.Content, typeof({{{returnType}}}), response.Headers));{{/returnType}}{{^returnType}}success();{{/returnType}}
+                 } catch (ApiException e) {
+                   failure(e);
+                 }
                },
                failure);
 
