@@ -95,11 +95,14 @@ namespace {{packageName}}.Client
             if (postBody != null) // http body (model) parameter
                 request.AddParameter("application/json", postBody, ParameterType.RequestBody);
 
-            yield return RestClient.Execute(request, success, 
+            yield return RestClient.Execute(request, success,
               (e) =>
               {
-                var apiException = new ApiException(0, "Local Exception:" + e.Message);
-                failure(apiException);
+                try {
+                  throw new ApiException(0, "Local Exception:" + e.Message, e);
+                } catch (ApiException ex) {
+                  failure(ex);
+                }
               });
 
         }
